@@ -16,12 +16,12 @@ The methods used are implemented in the following files:
  simulation and the code for the Bayes predictors.
 
  To reproduce the experiments, use:
-  * `python launch_simu_perf MCAR`
-  * `python launch_simu_perf MAR_logistic`
-  * `python launch_simu_perf gaussian_sm`
-  * `python launch_simu_perf probit_sm`
-  * `python launch_simu_depth_effect`
-  * `python launch_simu_architecture`
+  * `python launch_simu_perf.py MCAR`
+  * `python launch_simu_perf.py MAR_logistic`
+  * `python launch_simu_perf.py gaussian_sm`
+  * `python launch_simu_perf.py probit_sm`
+  * `python launch_simu_depth_effect.py`
+  * `python launch_simu_archi.py`
 
 These scripts save their results as csv files in the **results** foder. The
 plots can be obtained from these **csv** files by running the **plots_xxx**
