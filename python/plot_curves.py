@@ -77,12 +77,13 @@ if __name__ == '__main__':
         scores.loc[is_shallow, 'depth_or_width'] = scores.depth_or_width.min()
         scores = pd.concat([scores, scores_shallow], axis=0)
 
-        fig, axes = plt.subplots(3, 2, sharey=True, sharex=True,
+        fig, axes = plt.subplots(3, 3, sharey=True, sharex=True,
                                  figsize=(10, 10))
 
         n_features = scores.n_features.unique()
         n_samples = scores.n.dropna().unique()
-
+        print("n_samples",n_samples)
+        print("n_features",n_features)
         for i, p in enumerate(n_features):
             row_axes = axes[i]
             data = scores.query('n_features == @p')
