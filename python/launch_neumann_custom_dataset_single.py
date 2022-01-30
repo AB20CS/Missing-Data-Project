@@ -1,8 +1,7 @@
-# Same as launch_simu_archi.py except
-# only builds model at a single depth
+# Same as launch_simu_neumann_single.py except data is not simulated
 
 import numpy as np
-from neumannS0_mlp import Neumann_mlp
+from neumannS0_mlp import Neumann_mlp, Neumann
 from ground_truth import gen_params, gen_data
 from ground_truth import BayesPredictor_MCAR_MAR
 import pandas as pd
@@ -15,6 +14,9 @@ memory = Memory(location, verbose=0)
 fields = ['iter', 'method', 'train_test', 'r2', 'depth']
 ResultItem = namedtuple('ResultItem', fields)
 ResultItem.__new__.__defaults__ = (np.nan, )*len(ResultItem._fields)
+
+DATASET_FILENAME = '../datasets/diabetes.csv' # change filename depending on dataset used
+RESULTS_OUTPUT_FILENAME = '../results/simu_neumann_custom_dataset_single.csv'
 
 
 def bayes_approx_Neumann(sigma, mu, beta, X, depth, typ='mcar', k=None,
@@ -114,12 +116,18 @@ def run_one_iter(it, n_features):
     (n_features, mean, cov, beta, sigma2_noise, masking, missing_rate,
      prop_for_masking) = params
 
-    gen = gen_data([120000], params, random_state=it)
-    X, y = next(gen)
+    # load data from dataset
+    data = np.genfromtxt(DATASET_FILENAME, delimiter=',')
+    data = data[1:]  # remove header
 
-    # save synthetic dataset as CSV
-    pd.DataFrame(X).to_csv('../datasets/synthetic_X.csv')
-    pd.DataFrame(y).to_csv('../datasets/synthetic_y.csv')
+    X = []
+    y = np.empty(len(data))
+    for i in range(len(data)):
+        y[i] = data[i][-1:]
+        X.append(np.delete(data[i], -1))  # remove last element
+
+    X = np.asarray(X)
+    y = np.asarray(y)
 
     X_test = X[0:n_test]
     y_test = y[0:n_test]
@@ -127,6 +135,8 @@ def run_one_iter(it, n_features):
     y_val = y[n_test:(n_test + n_val)]
     X_train = X[(n_test + n_val):]
     y_train = y[(n_test + n_val):]
+
+    print("")
 
     # Run Neumann with various depths, and with and without residual connection
     d = 9
@@ -138,9 +148,12 @@ def run_one_iter(it, n_features):
 
         est.fit(X_train, y_train, X_val=X_val, y_val=y_val)
 
+        est.net = Neumann(n_features=n_features, depth=d,
+                          residual_connection=res,
+                          mlp_depth=0, init_type='normal')
+
         pred_test = est.predict(X_test)
         perf_test = get_score(pred_test, y_test)
-
         pred_train = est.predict(X)
         perf_train = get_score(pred_train, y)
 
@@ -174,6 +187,7 @@ def run_one_iter(it, n_features):
         iter=it, method='Bayes_rate', train_test="test", r2=perf)
     pred_train = bp.predict(X_train)
     perf_train = get_score(pred_train, y_train)
+
     res_train = ResultItem(
         iter=it, method='Bayes_rate', train_test="train", r2=perf)
     result_iter.extend([res_train, res_test])
@@ -182,11 +196,11 @@ def run_one_iter(it, n_features):
 
 
 if __name__ == '__main__':
-    n = int(1e5)
-    n_test = int(1e4)
-    n_val = int(1e4)
+    n = int(614)
+    n_test = int(77)
+    n_val = int(77)
     n_iter = 1
-    n_features = 20
+    n_features = 8
     n_jobs = 1
 
     results = Parallel(n_jobs=n_jobs)(
@@ -196,4 +210,4 @@ if __name__ == '__main__':
     results = [item for result_iter in results for item in result_iter]
     results = pd.DataFrame(results)
 
-    results.to_csv('../results/simu_neumann_single.csv')
+    results.to_csv(RESULTS_OUTPUT_FILENAME)
