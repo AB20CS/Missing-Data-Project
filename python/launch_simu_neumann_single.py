@@ -1,3 +1,6 @@
+# Same as launch_simu_archi.py except
+# only builds model at a single depth
+
 import numpy as np
 from neumannS0_mlp import Neumann_mlp
 from ground_truth import gen_params, gen_data
