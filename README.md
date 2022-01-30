@@ -26,3 +26,7 @@ The methods used are implemented in the following files:
 These scripts save their results as csv files in the **results** foder. The
 plots can be obtained from these **csv** files by running the **plots_xxx**
 files.
+
+## Datasets
+All datasets are found in the `datasets` folder.
+- `diabetes.csv`: https://www.kaggle.com/mathchi/diabetes-data-set/version/1
