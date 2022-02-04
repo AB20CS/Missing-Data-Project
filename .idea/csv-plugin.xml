@@ -10,7 +10,28 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\datasets\diabetes_complete.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\datasets\synthetic_y.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\results\diabetes_complete_mar_results.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\results\diabetes_complete_mcar_results.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
