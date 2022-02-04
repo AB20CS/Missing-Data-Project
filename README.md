@@ -30,3 +30,6 @@ files.
 ## Datasets
 All datasets are found in the `datasets` folder.
 - `diabetes.csv`: https://www.kaggle.com/mathchi/diabetes-data-set/version/1
+  - Contains missing values
+- `diabetes_complete.csv`: https://www.kaggle.com/homayoonkhadivi/ai-for-medical-prognosis-diabetes-datasets?select=y_data.csv
+  - Complete dataset (no missing values)
