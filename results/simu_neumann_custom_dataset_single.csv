@@ -1,8 +1,8 @@
 ,iter,method,train_test,r2,depth
-0,0,Neumann_res,train,-113484.09110179098,9.0
-1,0,Neumann_res,test,-131790.32173326617,9.0
-2,0,Neumann,train,-84658.62723905992,9.0
-3,0,Neumann,test,-97675.99013209448,9.0
+0,0,Neumann_res,train,-230278.42615283225,9.0
+1,0,Neumann_res,test,-228271.26026683048,9.0
+2,0,Neumann,train,-32387.89854305988,9.0
+3,0,Neumann,test,-32855.957845887686,9.0
 4,0,Neumann_analytic,,-690378.7559860242,0.0
 5,0,Neumann_analytic,,-693112.7167129522,1.0
 6,0,Neumann_analytic,,-696179.5561340089,2.0
