@@ -5,7 +5,7 @@ from math import sqrt, floor, log
 from joblib import Memory
 from scipy.optimize import root_scalar
 from scipy.special import comb
-from amputation import MCAR, MAR_logistic
+from amputation import MCAR, MAR_logistic, MNAR_logistic
 
 location = './cachedir'
 memory = Memory(location, verbose=0)
@@ -290,6 +290,23 @@ def gen_data(n_sizes, data_params, random_state=None):
         current_size = n_samples
 
         yield X, y
+
+
+def mask_data(X, data_params, random_state=None):
+    rng = check_random_state(random_state)
+
+    (n_features, mean, cov, beta, sigma2_noise, masking, missing_rate,
+     prop_for_masking) = data_params
+
+    if masking == 'MCAR':
+        M = MCAR(X, missing_rate, rng)
+    elif masking == 'MAR_logistic':
+        M = MAR_logistic(X, missing_rate, prop_for_masking, rng)
+    elif masking == 'MNAR_logistic':
+        M = MNAR_logistic(X, missing_rate, exclude_inputs=False)
+
+    np.putmask(X, M, np.nan)
+    return X
 
 
 class BayesPredictor_MCAR_MAR():

@@ -3,7 +3,7 @@
 
 import numpy as np
 from neumannS0_mlp_categorical import Neumann_mlp, Neumann
-from ground_truth import gen_params, gen_data
+from ground_truth import gen_params, gen_data, mask_data
 from ground_truth import BayesPredictor_MCAR_MAR
 import pandas as pd
 from collections import namedtuple
@@ -23,7 +23,7 @@ DATASET_FILENAME = '../datasets/diabetes_complete.csv' # change filename dependi
 RESULTS_OUTPUT_FILENAME = '../results/diabetes_complete_mar_results.csv'
 
 
-def bayes_approx_Neumann(sigma, mu, beta, X, depth, typ='mcar', k=None,
+def bayes_approx_Neumann(sigma, mu, beta, X, depth, typ='mar', k=None,
                          tsigma2=None, gm_approx=None, init=None):
     pred = []
     for x in X:
@@ -112,7 +112,7 @@ def run_one_iter(it, n_features):
     # generate parameters
     params = gen_params(
         n_features=n_features, missing_rate=0.5, prop_latent=0.5, snr=10,
-        masking='MAR_logistic', prop_for_masking=None, random_state=it)
+        masking='MAR_logistic', prop_for_masking=0.3, random_state=it)
 
     (n_features, mean, cov, beta, sigma2_noise, masking, missing_rate,
      prop_for_masking) = params
@@ -129,6 +129,8 @@ def run_one_iter(it, n_features):
 
     X = np.asarray(X)
     y = np.asarray(y)
+
+    X = mask_data(X, params)
 
     X_test = X[0:n_test]
     y_test = y[0:n_test]

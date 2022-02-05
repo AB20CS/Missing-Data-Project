@@ -1,5 +1,5 @@
 # Same as launch_neumann_custom_categorical.py except inputted data is complete
-# MCAR
+# MAR
 
 import numpy as np
 from neumannS0_mlp_categorical import Neumann_mlp, Neumann
@@ -20,10 +20,10 @@ ResultItem = namedtuple('ResultItem', fields)
 ResultItem.__new__.__defaults__ = (np.nan, )*len(ResultItem._fields)
 
 DATASET_FILENAME = '../datasets/diabetes_complete.csv' # change filename depending on dataset used
-RESULTS_OUTPUT_FILENAME = '../results/diabetes_complete_mcar_results.csv'
+RESULTS_OUTPUT_FILENAME = '../results/diabetes_complete_mnar_results.csv'
 
 
-def bayes_approx_Neumann(sigma, mu, beta, X, depth, typ='mcar', k=None,
+def bayes_approx_Neumann(sigma, mu, beta, X, depth, typ='mnar', k=None,
                          tsigma2=None, gm_approx=None, init=None):
     pred = []
     for x in X:
@@ -112,7 +112,7 @@ def run_one_iter(it, n_features):
     # generate parameters
     params = gen_params(
         n_features=n_features, missing_rate=0.5, prop_latent=0.5, snr=10,
-        masking='MCAR', prop_for_masking=None, random_state=it)
+        masking='MNAR_logistic', prop_for_masking=0.3, random_state=it)
 
     (n_features, mean, cov, beta, sigma2_noise, masking, missing_rate,
      prop_for_masking) = params
