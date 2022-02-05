@@ -1,5 +1,5 @@
-,iter,method,train_test,log_loss,depth
-0,0,Neumann_res,train,21.587745666503906,9
-1,0,Neumann_res,test,17.609346389770508,9
-2,0,Neumann,train,10.7977876663208,9
-3,0,Neumann,test,13.395467758178711,9
+,iter,method,train_test,auc,depth
+0,0,Neumann_res,train,0.5875663655356377,9
+1,0,Neumann_res,test,0.582312925170068,9
+2,0,Neumann,train,0.5030291586335219,9
+3,0,Neumann,test,0.5034013605442177,9

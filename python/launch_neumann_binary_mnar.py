@@ -1,5 +1,5 @@
 # Same as launch_neumann_custom_categorical.py except inputted data is complete
-# MAR
+# MNAR
 
 import numpy as np
 from neumannS0_mlp_categorical import Neumann_mlp, Neumann
@@ -7,7 +7,7 @@ from ground_truth import gen_params, gen_data, mask_data
 from ground_truth import BayesPredictor_MCAR_MAR
 import pandas as pd
 from collections import namedtuple
-from sklearn.metrics import log_loss
+from sklearn.metrics import log_loss, roc_auc_score
 import torch
 import torch.nn as nn
 
@@ -15,7 +15,7 @@ from joblib import Memory, Parallel, delayed
 location = './cachedir'
 memory = Memory(location, verbose=0)
 
-fields = ['iter', 'method', 'train_test', 'log_loss', 'depth']
+fields = ['iter', 'method', 'train_test', 'auc', 'depth']
 ResultItem = namedtuple('ResultItem', fields)
 ResultItem.__new__.__defaults__ = (np.nan, )*len(ResultItem._fields)
 
@@ -102,8 +102,7 @@ def bayes_approx_Neumann(sigma, mu, beta, X, depth, typ='mnar', k=None,
 
 
 def get_score(pred, y):
-    loss = nn.BCELoss()
-    return loss(torch.tensor(pred).float(), torch.tensor(y).float()).item()
+    return roc_auc_score(y, pred)
 
 
 @memory.cache
@@ -164,9 +163,9 @@ def run_one_iter(it, n_features):
             method = 'Neumann'
 
         res_train = ResultItem(iter=it, method=method, depth=d,
-                               train_test="train", log_loss=perf_train)
+                               train_test="train", auc=perf_train)
         res_test = ResultItem(iter=it, method=method, depth=d,
-                              train_test="test", log_loss=perf_test)
+                              train_test="test", auc=perf_test)
         result_iter.extend([res_train, res_test])
         print(result_iter)
 
