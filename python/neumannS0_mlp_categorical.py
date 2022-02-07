@@ -1,5 +1,6 @@
 '''Implements Neumann with the posibility to do batch learning'''
 # Same as neumannS0_mlp, except is for categorical y values
+# Specifically factored for binary classification
 
 import math
 import numpy as np
