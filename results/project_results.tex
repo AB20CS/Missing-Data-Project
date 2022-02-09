@@ -1,0 +1,149 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage{verbatim}
+\usepackage{amsmath}
+\usepackage{titling}
+
+\setlength{\droptitle}{-14em}  
+
+\title{Missing Data Project Results}
+\author{Anindro Bhattacharya }
+
+\begin{document}
+
+\maketitle
+
+\section{NeuMiss Architecture}
+\subsection{Real Missing Data}
+
+The NeuMiss architecture was trained on a \href{https://www.kaggle.com/mathchi/diabetes-data-set/version/1}{diabetes dataset containing missing values} with the following hyperparameters:
+\begin{itemize}
+  \item depth = 9
+  \item \# of epochs = 100
+  \item batch size = 10
+  \item learning rate = 0.01/8
+\end{itemize}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c| c|} 
+ \hline
+  & Log Loss (Binary Cross Entropy Loss) \\ [0.5ex]
+ \hline 
+ Neumann with residual connections & 10.673 \\ 
+ Neumann without residual connections & 28.960 \\
+ [1ex] 
+ \hline
+\end{tabular}
+\caption{Log loss for NeuMiss applied to \href{https://www.kaggle.com/mathchi/diabetes-data-set/version/1}{diabetes dataset containing missing values}}
+\label{table:1}
+\end{table}
+
+\subsection{Masking a Complete Dataset}
+The NeuMiss architecture was trained on a \href{https://www.kaggle.com/homayoonkhadivi/ai-for-medical-prognosis-diabetes-datasets?select=y_data.csv}{diabetes dataset containing no missing values} with the following hyperparameters:
+
+\begin{itemize}
+  \item depth = 9
+  \item \# of epochs = 100
+  \item batch size = 10
+  \item learning rate = 0.01/4
+\end{itemize}
+
+Random Forest Classifier was trained with \verb|n_informative=4|, \verb|n_redundant=0|, \verb|max_depth=8| using \verb|sklearn|.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c| c c|} 
+ \hline
+  & Log Loss (Binary Cross Entropy Loss) & AUROC \\ [0.5ex]
+ \hline 
+ Neumann with residual connections & 5.589 & 0.5 \\ 
+ Neumann without residual connections & 38.149 & 0.536  \\
+ Random Forest Classifier & 31.169 & 0.5 \\ [1ex] 
+ \hline
+\end{tabular}
+\caption{Log loss and AUROC for NeuMiss and Random Forest Classifier applied to \href{https://www.kaggle.com/homayoonkhadivi/ai-for-medical-prognosis-diabetes-datasets?select=y_data.csv}{diabetes dataset} without any data amputation}
+\label{table:2}
+\end{table}
+
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c| c c c|} 
+ \hline
+  & MCAR & MAR & MNAR \\ [0.5ex]
+ \hline 
+ Neumann with residual connections & 0.457 & 0.588 & 0.597 \\ 
+ Neumann without residual connections & 0.506 & 0.503 & 0.707 \\
+ [1ex] 
+ \hline
+\end{tabular}
+\caption{AUROC for NeuMiss applied to \href{https://www.kaggle.com/homayoonkhadivi/ai-for-medical-prognosis-diabetes-datasets?select=y_data.csv}{diabetes dataset} masked with various mechanisms of missingness}
+\label{table:2}
+\end{table}
+
+
+\subsection{Estimating ${(\Sigma_{obs(m)})}^{-1}$}
+The actual covariance matrix is given below:
+\begin{equation}
+{(\Sigma_{obs(m)})}^{-1} = 
+\begin{bmatrix}
+-0.074430585 & -0.4932546 & -0.16943908 & 0.281695 \\
+-0.2888431 & -0.3939461 & 0.14461023 & 0.4538434 \\
+0.19937307 & -0.23638344 & -0.36582643 & 0.48601776 \\
+0.47908944 & -0.08196759 & -0.26269215 & -0.36598015
+\end{bmatrix}
+\end{equation}
+
+
+The following is the estimated covariance matrix with MCAR masking:
+\begin{equation}
+{(\Sigma_{obs(m)})}^{-1} \approx
+\begin{bmatrix}
+0.11353505&-0.27601248&-0.24196988&0.013374865\\ 
+0.46621287&0.41319656&0.2962613&-0.4033689\\
+0.45569807&-0.010969877&0.06865537&-0.058603525\\
+-0.18620259&-0.46399462&-0.13635439&0.39681786\\
+\end{bmatrix}
+\end{equation}
+
+The following is the estimated covariance matrix with MAR masking:
+\begin{equation}
+{(\Sigma_{obs(m)})}^{-1} \approx
+\begin{bmatrix}
+0.23384035&0.14557779&-0.4143983&-0.011400878\\
+-0.09307128&0.32880175&-0.30733913&-0.17595828\\
+-0.22125101&-0.3588832&0.22725868&0.1586389\\
+0.3361441&0.03262663&-0.08088577&-0.1738466\\
+\end{bmatrix}
+\end{equation}
+
+The following is the estimated covariance matrix with MNAR masking:
+\begin{equation}
+{(\Sigma_{obs(m)})}^{-1} \approx
+\begin{bmatrix}
+-0.39501578&-0.304408&0.39646292&-0.46904248\\
+-0.23762369&-0.0014175177&0.4798187&-0.36039358\\
+0.08218175&0.4626212&0.009880781&-0.41792983\\
+0.4573294&0.47776115&-0.30522943&-0.015576959\\
+\end{bmatrix}
+\end{equation}
+
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c| c c c|} 
+ \hline
+  & MCAR & MAR & MNAR \\ [0.5ex]
+ \hline 
+ MSE & 0.245 & 0.160 & 0.241 \\ 
+ [1ex] 
+ \hline
+\end{tabular}
+\caption{Mean squared error (MSE) of estimated ${(\Sigma_{obs(m)})}^{-1}$ with MCAR, MAR and MNAR masking}
+\label{table:2}
+\end{table}
+
+\end{document}
