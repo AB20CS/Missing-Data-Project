@@ -7,7 +7,7 @@ from ground_truth import gen_params, gen_data
 from ground_truth import BayesPredictor_MCAR_MAR
 import pandas as pd
 from collections import namedtuple
-from sklearn.metrics import log_loss
+from sklearn.metrics import log_loss, roc_auc_score
 import torch
 import torch.nn as nn
 
@@ -19,8 +19,8 @@ fields = ['iter', 'method', 'train_test', 'log_loss', 'depth']
 ResultItem = namedtuple('ResultItem', fields)
 ResultItem.__new__.__defaults__ = (np.nan, )*len(ResultItem._fields)
 
-DATASET_FILENAME = '../datasets/diabetes.csv' # change filename depending on dataset used
-RESULTS_OUTPUT_FILENAME = '../results/diabetes_results.csv'
+DATASET_FILENAME = '../datasets/diabetes_complete.csv' # change filename depending on dataset used
+RESULTS_OUTPUT_FILENAME = '../results/diabetes_complete_unmasked_results.csv'
 
 
 def bayes_approx_Neumann(sigma, mu, beta, X, depth, typ='mcar', k=None,
@@ -102,8 +102,9 @@ def bayes_approx_Neumann(sigma, mu, beta, X, depth, typ='mcar', k=None,
 
 
 def get_score(pred, y):
-    loss = nn.BCELoss()
-    return loss(torch.tensor(pred).float(), torch.tensor(y).float()).item()
+    # loss = nn.BCELoss()
+    # return loss(torch.tensor(pred).float(), torch.tensor(y).float()).item()
+    return roc_auc_score(y, pred)
 
 
 @memory.cache
@@ -142,8 +143,8 @@ def run_one_iter(it, n_features):
     for res in [True, False]:
         print('Neumann d={}, res={}'.format(d, res))
         est = Neumann_mlp(
-            depth=d, n_epochs=100, batch_size=10, lr=1e-2/n_features,
-            early_stopping=False, residual_connection=res, verbose=True)
+            depth=1, n_epochs=100, batch_size=10, lr=1e-2/n_features,
+            early_stopping=False, residual_connection=res, verbose=False)
 
         est.fit(X_train, y_train, X_val=X_val, y_val=y_val)
 
@@ -198,7 +199,7 @@ if __name__ == '__main__':
     n_test = int(77)
     n_val = int(77)
     n_iter = 1
-    n_features = 8
+    n_features = 4
     n_jobs = 1
 
     results = Parallel(n_jobs=n_jobs)(
