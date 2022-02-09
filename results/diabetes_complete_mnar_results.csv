@@ -1,5 +1,5 @@
 ,iter,method,train_test,auc,depth
-0,0,Neumann_res,train,0.5972964930172942,9
-1,0,Neumann_res,test,0.6265306122448979,9
-2,0,Neumann,train,0.6243841070340156,9
-3,0,Neumann,test,0.7074829931972789,9
+0,0,Neumann_res,train,0.5031335241827266,9
+1,0,Neumann_res,test,0.4751700680272109,9
+2,0,Neumann,train,0.4819505426285729,9
+3,0,Neumann,test,0.5527210884353742,9

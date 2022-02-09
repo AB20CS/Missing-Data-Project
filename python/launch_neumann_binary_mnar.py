@@ -21,6 +21,7 @@ ResultItem.__new__.__defaults__ = (np.nan, )*len(ResultItem._fields)
 
 DATASET_FILENAME = '../datasets/diabetes_complete.csv' # change filename depending on dataset used
 RESULTS_OUTPUT_FILENAME = '../results/diabetes_complete_mnar_results.csv'
+COV_MATRIX_OUTPUT_FILENAME = '../results/diabetes_complete_mnar_cov.csv'
 
 
 def bayes_approx_Neumann(sigma, mu, beta, X, depth, typ='mnar', k=None,
@@ -168,6 +169,7 @@ def run_one_iter(it, n_features):
                               train_test="test", auc=perf_test)
         result_iter.extend([res_train, res_test])
         print(result_iter)
+        pd.DataFrame(est.net.l_W[0].detach().numpy()).to_csv(COV_MATRIX_OUTPUT_FILENAME, header=False, index=False)
 
     # # Run the Bayes predictor approximated with Neumann
     # depths = [0, 1, 2, 3, 4, 5, 10, 15, 20, 30, 40, 50, 100]

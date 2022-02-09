@@ -269,5 +269,5 @@ class Neumann_mlp(BaseEstimator):
 
         with torch.no_grad():
             y_hat = self.net(X, M, phase='test')
-
+        # print(self.net.l_W[0])
         return np.array(y_hat)
