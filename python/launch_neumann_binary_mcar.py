@@ -111,7 +111,7 @@ def run_one_iter(it, n_features):
     result_iter = []
     # generate parameters
     params = gen_params(
-        n_features=n_features, missing_rate=0.5, prop_latent=0.5, snr=10,
+        n_features=n_features, missing_rate=0.2, prop_latent=0.5, snr=10,
         masking='MCAR', prop_for_masking=None, random_state=it)
 
     (n_features, mean, cov, beta, sigma2_noise, masking, missing_rate,
