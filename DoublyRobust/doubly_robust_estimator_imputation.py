@@ -6,6 +6,8 @@ import numpy as np
 from math import sqrt
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.utils import check_random_state
+from sklearn.experimental import enable_iterative_imputer
+from sklearn.impute import IterativeImputer
 from scipy.optimize import fsolve
 
 
@@ -325,7 +327,7 @@ def doubly_robust(df, df_pred, X, Y):
 
 
 if __name__ == "__main__":
-    n_features = 10
+    n_features = 5
     # Generate data
     params = gen_params(
         n_features=n_features, missing_rate=0.5, prop_latent=0.5, snr=10,
@@ -334,7 +336,7 @@ if __name__ == "__main__":
     (n_features, mean, cov, beta, sigma2_noise, masking, missing_rate,
      prop_for_masking) = params
 
-    gen = gen_data([100], params, random_state=None)
+    gen = gen_data([12000], params, random_state=None)
     X, X_no_mask, y = next(gen)
 
 
@@ -368,24 +370,24 @@ if __name__ == "__main__":
 
     pd.DataFrame(X).to_csv('./synthetic_X_deltas.csv', index=False, index_label=False)
     
-    means = []
+    # Impute with MICE
+    imp = IterativeImputer(random_state=0)
+    imp.fit(X.to_numpy())
+    X_mice = pd.DataFrame(imp.transform(X.to_numpy()), columns=X.columns)
 
+    neumiss_means = []
+    mice_means = []
     for i in all_columns:
         y_col = i
         X_cols = all_columns.drop(i)
 
-        means.append(doubly_robust(X, X_pred, X_cols, y_col))
+        neumiss_means.append(doubly_robust(X, X_pred, X_cols, y_col))
+        mice_means.append(doubly_robust(X, X_mice, X_cols, y_col))
    
-    print('Naive Calculation of Mean (on unmasked data): {}'.format(np.mean(X_no_mask)))
-    print('Mean with of All Data with NeuMiss (Bayes\' Predictor Imputation: {}'.format(np.mean(means)))
+    naive_mean = np.mean(X_no_mask)
+    neumiss_dr_mean = np.mean(neumiss_means)
+    mice_mean = np.mean(mice_means)
+    print('Naive Calculation of Mean (on unmasked data): {}'.format(naive_mean))
+    print('Mean of All Data with NeuMiss (Bayes\' Predictor) Imputation:\n\tmean={}, bias={}'.format(neumiss_dr_mean, naive_mean - neumiss_dr_mean))
+    print('Mean of All Data with MICE Imputation:\n\tmean={}, bias={}'.format(mice_mean, naive_mean - mice_mean))
 
-
-
-    # naive_mu = data_with_categ[Y].mean()
-    # print('Naive Calculation of Mean: mu = {}'.format(naive_mu))
-
-    # # Correctly specified models
-    # print("\nCorrectly specified models")
-
-    # mu_dr = doubly_robust(data_with_categ, X, Y)
-    # print('\tDoubly Robust Esimator: mu_dr = {}, bias = {}'.format(mu_dr, naive_mu - mu_dr))
