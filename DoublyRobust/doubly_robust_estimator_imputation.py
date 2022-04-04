@@ -336,7 +336,7 @@ if __name__ == "__main__":
     (n_features, mean, cov, beta, sigma2_noise, masking, missing_rate,
      prop_for_masking) = params
 
-    gen = gen_data([12000], params, random_state=None)
+    gen = gen_data([100], params, random_state=None)
     X, X_no_mask, y = next(gen)
 
 
@@ -344,13 +344,13 @@ if __name__ == "__main__":
     y = pd.DataFrame(y)
     X[len(X.columns)] = y
 
-    X_pred = pd.DataFrame()
+    X_neumiss = pd.DataFrame()
     all_columns = X.columns
     for i in X.columns:
         curr_columns = all_columns.drop(i)
-        X_pred[i] = bayes_approx_Neumann(sigma=cov, mu=mean, beta=beta, X=X[curr_columns].to_numpy(), depth=9)
+        X_neumiss[i] = bayes_approx_Neumann(sigma=cov, mu=mean, beta=beta, X=X[curr_columns].to_numpy(), depth=9)
 
-    pd.DataFrame(X_pred).to_csv('./synthetic_X_pred.csv', index=False, index_label=False)
+    pd.DataFrame(X_neumiss).to_csv('./synthetic_X_pred.csv', index=False, index_label=False)
 
     pd.DataFrame(X_no_mask).to_csv('./synthetic_X_no_mask.csv', index=False, index_label=False)
     pd.DataFrame(X).to_csv('./synthetic_X.csv', index=False, index_label=False)
@@ -366,7 +366,7 @@ if __name__ == "__main__":
                 Delta += [1]
         Delta = np.array(Delta)
         X['Delta_' + str(i)] = Delta
-        X_pred['Delta_' + str(i)] = Delta
+        X_neumiss['Delta_' + str(i)] = Delta
 
     pd.DataFrame(X).to_csv('./synthetic_X_deltas.csv', index=False, index_label=False)
     
@@ -375,19 +375,28 @@ if __name__ == "__main__":
     imp.fit(X.to_numpy())
     X_mice = pd.DataFrame(imp.transform(X.to_numpy()), columns=X.columns)
 
-    neumiss_means = []
-    mice_means = []
+    neumiss_dr_means = []
+    mice_dr_means = []
     for i in all_columns:
         y_col = i
         X_cols = all_columns.drop(i)
 
-        neumiss_means.append(doubly_robust(X, X_pred, X_cols, y_col))
-        mice_means.append(doubly_robust(X, X_mice, X_cols, y_col))
+        neumiss_dr_means.append(doubly_robust(X, X_neumiss, X_cols, y_col))
+        mice_dr_means.append(doubly_robust(X, X_mice, X_cols, y_col))
    
     naive_mean = np.mean(X_no_mask)
-    neumiss_dr_mean = np.mean(neumiss_means)
-    mice_mean = np.mean(mice_means)
+
+    neumiss_mean = np.mean(X_neumiss.to_numpy())
+    mice_mean = np.mean(X_mice.to_numpy())
+
+    neumiss_dr_mean = np.mean(neumiss_dr_means)
+    mice_dr_mean = np.mean(mice_dr_means)
+
     print('Naive Calculation of Mean (on unmasked data): {}'.format(naive_mean))
-    print('Mean of All Data with NeuMiss (Bayes\' Predictor) Imputation:\n\tmean={}, bias={}'.format(neumiss_dr_mean, naive_mean - neumiss_dr_mean))
-    print('Mean of All Data with MICE Imputation:\n\tmean={}, bias={}'.format(mice_mean, naive_mean - mice_mean))
+
+    print('\nMean of All Data with NeuMiss (Bayes\' Predictor) Imputation - No Doubly Robust:\n\tmean={}, bias={}'.format(neumiss_mean, naive_mean - neumiss_mean))
+    print('Mean of All Data with MICE Imputation - No Doubly Robust:\n\tmean={}, bias={}'.format(mice_mean, naive_mean - mice_mean))
+
+    print('\nMean of All Data with NeuMiss (Bayes\' Predictor) Imputation and Doubly Robust:\n\tmean={}, bias={}'.format(neumiss_dr_mean, naive_mean - neumiss_dr_mean))
+    print('Mean of All Data with MICE Imputation and Doubly Robust:\n\tmean={}, bias={}'.format(mice_dr_mean, naive_mean - mice_dr_mean))
 
