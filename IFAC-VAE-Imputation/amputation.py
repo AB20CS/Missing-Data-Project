@@ -115,7 +115,7 @@ def MAR_logistic(X, p, p_obs, random_state):
     ps = sigmoid(X[:, idxs_obs].dot(coeffs) + intercepts)
     ber = rng.rand(n, d_na)
     mask[:, idxs_nas] = ber < ps
-
+    
     return mask
 
 
@@ -215,18 +215,18 @@ def MNAR_logistic(X, p, p_params =.3, exclude_inputs=True):
 
 def ampute(X):
 
-    missing_rate = 0.5
-    prop_for_masking = 0.3
+    missing_rate = 0.7
+    prop_for_masking = 0.7
     rng = None
 
-    X_MCAR = np.empty(X.shape)
-    X_MAR = np.empty(X.shape)
-    X_MNAR = np.empty(X.shape)
-    
+    X_MCAR = np.copy(X)
+    X_MAR = np.copy(X)
+    X_MNAR = np.copy(X)
+
     np.putmask(X_MCAR, MCAR(X, missing_rate, rng), np.nan)
     np.putmask(X_MAR, MAR_logistic(X, missing_rate, prop_for_masking, rng), np.nan)
     np.putmask(X_MNAR, MNAR_logistic(X, missing_rate), np.nan)
-
+    
     return X_MCAR, X_MAR, X_MNAR
 
 if __name__ == '__main__':
@@ -234,7 +234,7 @@ if __name__ == '__main__':
     X = np.genfromtxt(DATA, delimiter=',')
 
     X_MCAR, X_MAR, X_MNAR = ampute(X)
-
+    
     pd.DataFrame(X_MCAR).to_csv("X_MCAR.csv", index=False, header=False)
     pd.DataFrame(X_MAR).to_csv("X_MAR.csv", index=False, header=False)
     pd.DataFrame(X_MNAR).to_csv("X_MNAR.csv", index=False, header=False)

@@ -38,10 +38,10 @@ corr_level = "light"
 DataPath = data_source + "data.csv"
 
 # Path to corrupted data:
-CorruptDataPath = data_source + "datacorrupt" + corr_level + ".csv"
+# CorruptDataPath = data_source + "datacorrupt" + corr_level + ".csv"
 
-miss_mech = "MNAR"
-# CorruptDataPath = data_source + "_" + miss_mech + ".csv"
+miss_mech = "MCAR"
+CorruptDataPath = data_source + "_" + miss_mech + ".csv"
 
 # VAE network size:
 Decoder_hidden1 = 20

@@ -294,7 +294,7 @@ class TFVariationalAutoencoder(object):
             total_batch = int(n_samples / self.batch_size)
             # Loop over all batches
             for i in range(total_batch):
-                batch_xs = next_batch(XData,self.batch_size, MissingVals = False)
+                batch_xs = next_batch(XData,self.batch_size, MissingVals = True)
                 # Fit training using batch data
                 cost = self.partial_fit(batch_xs)
                 # Compute average loss
